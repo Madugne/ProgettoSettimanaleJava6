@@ -24,7 +24,5 @@ public class AuthService {
         } else {
             throw new UnauthorizedException("Credentials not valid, please retry.");
         }
-
-
     }
 }

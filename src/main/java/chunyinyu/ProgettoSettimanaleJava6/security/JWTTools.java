@@ -27,7 +27,7 @@ public class JWTTools {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public void verifyToken(String token) {
         try {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
         } catch (ExpiredJwtException | MalformedJwtException | SecurityException | IllegalArgumentException e) {
@@ -35,7 +35,7 @@ public class JWTTools {
         }
     }
 
-    public String getSubjectFromToken(String token) {
+    public String extractIdFromToken(String token) {
         return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parseSignedClaims(token).getPayload().getSubject();
     }
 

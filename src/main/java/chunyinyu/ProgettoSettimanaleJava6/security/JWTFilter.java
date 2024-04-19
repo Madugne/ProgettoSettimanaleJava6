@@ -27,22 +27,21 @@ public class JWTFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer "))
-            throw new UnauthorizedException("Token missing or invalid");
-        String token = authorizationHeader.substring(7);
-        jwtTools.validateToken(token);
-        String subject = jwtTools.getSubjectFromToken(token);
-        User currentUser = userService.findById(UUID.fromString(subject));
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) throw new UnauthorizedException("Per favore inserisci il token nell'Authorization Header");
+        String accessToken = authHeader.substring(7);
+        jwtTools.verifyToken(accessToken);
+        String id = jwtTools.extractIdFromToken(accessToken);
+        User currentUser = this.userService.findById(UUID.fromString(id));
         Authentication authentication = new UsernamePasswordAuthenticationToken(currentUser, null, currentUser.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         filterChain.doFilter(request, response);
     }
-
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(HttpServletRequest request){
         return new AntPathMatcher().match("/auth/**", request.getServletPath());
     }
 }

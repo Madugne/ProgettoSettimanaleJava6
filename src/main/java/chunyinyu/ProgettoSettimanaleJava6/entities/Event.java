@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -24,16 +25,23 @@ public class Event {
     private LocalDate date;
     private String location;
     private int slots;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "event")
+    private List<User> users;
 
-    public Event(String title, String description, LocalDate date, String location, int slots, User user) {
+    public Event(String title, String description, LocalDate date, String location, int slots, List<User> user) {
         this.title = title;
         this.description = description;
         this.date = date;
         this.location = location;
         this.slots = slots;
-        this.user = user;
+        this.users = user;
+    }
+
+    public Event(String title, String description, LocalDate date, String location, int slots) {
+        this.title = title;
+        this.description = description;
+        this.date = date;
+        this.location = location;
+        this.slots = slots;
     }
 }

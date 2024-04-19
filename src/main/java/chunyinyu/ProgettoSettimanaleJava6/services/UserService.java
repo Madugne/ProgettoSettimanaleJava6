@@ -1,11 +1,14 @@
 package chunyinyu.ProgettoSettimanaleJava6.services;
 
+import chunyinyu.ProgettoSettimanaleJava6.entities.Event;
 import chunyinyu.ProgettoSettimanaleJava6.entities.User;
 import chunyinyu.ProgettoSettimanaleJava6.exceptions.BadRequestException;
 import chunyinyu.ProgettoSettimanaleJava6.exceptions.RecordNotFoundException;
 import chunyinyu.ProgettoSettimanaleJava6.payloads.NewUserDTO;
 import chunyinyu.ProgettoSettimanaleJava6.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,8 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder bCrypt;
+    @Autowired
+    private EventService eventService;
 
     public User save(NewUserDTO body) throws BadRequestException{
         this.userRepository.findByEmail(body.email()).ifPresent(
@@ -48,5 +53,21 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new RecordNotFoundException("User with email: " + email + " not found!"));
+    }
+
+    public User assignUserToEvent(UUID id, UUID eventId) {
+        User user = this.findById(id);
+        Event event = eventService.findById(eventId);
+        user.setEvent(event);
+        return userRepository.save(user);
+    }
+
+    public Page<User> getDevicesByEmployee(Event event, Pageable pageable) {
+        return userRepository.findAllByEvent(event, pageable);
+    }
+    public Event findEventByUser(UUID userId) {
+        User user = findById(userId);
+        UUID eventId = user.getEvent().getId();
+        return eventService.findById(eventId);
     }
 }

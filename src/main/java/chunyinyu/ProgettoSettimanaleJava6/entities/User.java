@@ -34,7 +34,9 @@ public class User implements UserDetails {
     @JsonIgnore
     @Enumerated(EnumType.STRING)
     private UserRoles role = UserRoles.HOST;
-
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;

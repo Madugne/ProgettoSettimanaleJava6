@@ -26,12 +26,16 @@ public class ExceptionsHandler {
 
 
     @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDTO handleBadRequestException(BadRequestException e) {
-        if (e.getErrors() != null) {
-            return new ErrorDTO(e.getMessage() + ": " + e.getErrors().stream().map(objectError -> objectError.getDefaultMessage()).collect(Collectors.joining(". ")), LocalDateTime.now());
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ErrorDTO handleBadRequest(BadRequestException ex){
+        if(ex.getErrorsList() != null) {
+            String message = ex.getErrorsList().stream()
+                    .map(objectError -> objectError.getDefaultMessage())
+                    .collect(Collectors.joining(". " ));
+            return new ErrorDTO(message, LocalDateTime.now());
+        } else {
+            return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
         }
-        return new ErrorDTO(e.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
