@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,8 +26,8 @@ public class Event {
     private LocalDate date;
     private String location;
     private int slots;
-    @OneToMany(mappedBy = "event")
-    private List<User> users;
+    @ManyToMany(mappedBy = "events")
+    private List<User> users = new ArrayList<>();
 
     public Event(String title, String description, LocalDate date, String location, int slots, List<User> user) {
         this.title = title;

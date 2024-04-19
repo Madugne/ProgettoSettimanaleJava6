@@ -8,10 +8,14 @@ import chunyinyu.ProgettoSettimanaleJava6.payloads.NewUserDTO;
 import chunyinyu.ProgettoSettimanaleJava6.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,6 +26,12 @@ public class UserService {
     private PasswordEncoder bCrypt;
     @Autowired
     private EventService eventService;
+
+    public Page<User> getUsers(int page, int size, String sortBy){
+        if(size > 50) size = 50;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return userRepository.findAll(pageable);
+    }
 
     public User save(NewUserDTO body) throws BadRequestException{
         this.userRepository.findByEmail(body.email()).ifPresent(
@@ -58,16 +68,13 @@ public class UserService {
     public User assignUserToEvent(UUID id, UUID eventId) {
         User user = this.findById(id);
         Event event = eventService.findById(eventId);
-        user.setEvent(event);
+        List<Event> eventsList = user.getEvents();
+        eventsList.add(event);
+        user.setEvents(eventsList);
         return userRepository.save(user);
     }
 
-    public Page<User> getDevicesByEmployee(Event event, Pageable pageable) {
-        return userRepository.findAllByEvent(event, pageable);
-    }
-    public Event findEventByUser(UUID userId) {
-        User user = findById(userId);
-        UUID eventId = user.getEvent().getId();
-        return eventService.findById(eventId);
-    }
+//    public Page<User> getEventsByUser(Event event, Pageable pageable) {
+//        return userRepository.findAllByEvent(event, pageable);
+//    }
 }

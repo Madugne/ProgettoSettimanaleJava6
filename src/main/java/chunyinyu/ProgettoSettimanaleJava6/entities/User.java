@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +34,15 @@ public class User implements UserDetails {
     private String password;
     @JsonIgnore
     @Enumerated(EnumType.STRING)
-    private UserRoles role = UserRoles.HOST;
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    private Event event;
+    private UserRoles role = UserRoles.USER;
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+            name = "user_event",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<Event> events = new ArrayList<>();
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
