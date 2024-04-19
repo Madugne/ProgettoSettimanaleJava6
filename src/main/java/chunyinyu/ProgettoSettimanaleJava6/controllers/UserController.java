@@ -65,4 +65,8 @@ public class UserController {
         userService.assignUserToEvent(userId, eventId);
     }
 
+    @PutMapping("/me/assignEvent/{eventId}")
+    public void assignEvent(@AuthenticationPrincipal User currentAuthenticatedUser, @PathVariable UUID eventId){
+        this.userService.assignUserToEvent(currentAuthenticatedUser.getId(), eventId);
+    }
 }
